@@ -61,40 +61,53 @@ const render = () => {
         enemy.render(context, gridWidth, gridHeight);
     }
 
+    for (let y = 0; y < Y_SIZE; y++) {
+        for (let x = 0; x < X_SIZE; x++) {
+            if ((x + y) % 2 == 0) {
+                context.fillStyle = "#0000000a";
+                context.fillRect(x * gridWidth, y * gridHeight, gridWidth, gridHeight);
+            }
+        }
+    }
+
     player.render(context, gridWidth, gridHeight);
 };
 
 window.onkeydown = e => {
     switch (e.keyCode) {
         case 38:
-            player.move = 1;
+            player.top = 1;
             break;
         case 40:
-            player.move = 3;
+            player.bot = 1;
             break;
         case 37:
-            player.move = 2;
+            player.left = 1;
             break;
         case 39:
-            player.move = 4;
+            player.right = 1;
             break;
         default:
             break;
-
     }
 };
 
 window.onkeyup = e => {
     switch (e.keyCode) {
         case 38:
+            player.top = 0;
+            break;
         case 40:
+            player.bot = 0;
+            break;
         case 37:
+            player.left = 0;
+            break;
         case 39:
-            player.move = 0;
+            player.right = 0;
             break;
         default:
             break;
-
     }
 };
 

@@ -5,9 +5,23 @@ class Player {
 
         this.velocity = 1;
 
+        this.top = 0;
+        this.bot = 0;
+        this.left = 0;
+        this.right = 0;
+
         this.move = 0;
 
         this._LAST_UPDATE = performance.now();
+    }
+
+    calc_move() {
+        let n = 0;
+        n = this.right ? 4 : n;
+        n = this.left ? 2 : n;
+        n = this.bot ? 3 : n;
+        n = this.top ? 1 : n;
+        this.move = n;
     }
 
     get_id(map, direct) {
@@ -37,6 +51,9 @@ class Player {
             return;
         }
         this._LAST_UPDATE = NOW;
+
+        this.calc_move();
+
         switch (this.move) {
             case 0: //STOP
                 break;
