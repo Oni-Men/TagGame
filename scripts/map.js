@@ -19,7 +19,7 @@ class Map {
         return {
             color: "#aaa",
             durability: 100,
-            id: 1
+            id: ObjectType.Stone
         };
     }
 
@@ -27,7 +27,7 @@ class Map {
         return {
             color: "#fff",
             durability: 0,
-            id: 0
+            id: ObjectType.Air
         };
     }
 

@@ -1,7 +1,7 @@
 class Player {
     constructor() {
-        this.x = 0;
-        this.y = 0;
+        this.x = 4;
+        this.y = 7;
 
         this.velocity = 1;
 
@@ -10,18 +10,16 @@ class Player {
         this.left = 0;
         this.right = 0;
 
-        this.move = 0;
-
-        this._LAST_UPDATE = performance.now();
+        this.direction = Direction.NONE;
     }
 
     calc_move() {
-        let n = 0;
-        n = this.right ? 4 : n;
-        n = this.left ? 2 : n;
-        n = this.bot ? 3 : n;
-        n = this.top ? 1 : n;
-        this.move = n;
+        let n = Direction.NONE;
+        n = this.right ? Direction.RIGHT : n;
+        n = this.left ? Direction.LEFT : n;
+        n = this.bot ? Direction.BOTTOM : n;
+        n = this.top ? Direction.TOP : n;
+        this.direction = n;
     }
 
     get_id(map, direct) {
@@ -46,33 +44,27 @@ class Player {
     }
 
     update(map) {
-        const NOW = performance.now();
-        if (NOW - this._LAST_UPDATE < 100) {
-            return;
-        }
-        this._LAST_UPDATE = NOW;
-
         this.calc_move();
 
-        switch (this.move) {
-            case 0: //STOP
+        switch (this.direction) {
+            case Direction.NONE:
                 break;
-            case 1: //TOP
+            case Direction.TOP:
                 if (this.y > 0 && this.get_id(map, 1) == 0) {
                     this.y -= this.velocity;
                 }
                 break;
-            case 2: //LEFT
+            case Direction.LEFT:
                 if (this.x > 0 && this.get_id(map, 2) == 0) {
                     this.x -= this.velocity;
                 }
                 break;
-            case 3: //BOTTOM
+            case Direction.BOTTOM:
                 if (this.y < map.Y_SIZE - 1 && this.get_id(map, 3) == 0) {
                     this.y += this.velocity;
                 }
                 break;
-            case 4: //RIGHT
+            case Direction.RIGHT:
                 if (this.x < map.X_SIZE - 1 && this.get_id(map, 4) == 0) {
                     this.x += this.velocity;
                 }

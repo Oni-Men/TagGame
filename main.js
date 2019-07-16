@@ -8,11 +8,16 @@ const context = canvas.getContext("2d");
 
 const obstacles = [
     {
-        x: 1,
-        y: 1,
+        x: 5,
+        y: 9,
         data: Map.default_data()
     }, {
         x: 5,
+        y: 8,
+        data: Map.default_data()
+    },
+    {
+        x: 6,
         y: 8,
         data: Map.default_data()
     }
@@ -24,16 +29,21 @@ const player = new Player();
 
 const enemies = [];
 for (let i = 0; i < 1; i++) {
-    enemies.push(new Enemy(X_SIZE / 2, Y_SIZE / 2));
+    enemies.push(new Enemy(X_SIZE - 1, Y_SIZE - 1));
 }
 
 
+let last_update = performance.now();
 const loop = () => {
-
-    player.update(map);
-    for (enemy of enemies) {
-        enemy.update(player, map);
+    const now = performance.now();
+    if (now - last_update > 250) {
+        player.update(map);
+        for (enemy of enemies) {
+            enemy.update(player, map);
+        }
+        last_update = now;
     }
+
 
     render();
 
