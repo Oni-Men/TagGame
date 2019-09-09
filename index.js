@@ -1,22 +1,26 @@
-require = (v) => {
+const modules = [
+    "lib/hude.js",
+    "class/line.js",
+    "class/entity.js",
+    "main.js"
+];
+
+const require = (p) => {
     const script = document.createElement('script');
-    script.src = v;
+    script.src = p;
     document.body.appendChild(script);
+
+    return script;
 };
 
-/*
-    LOAD LIBRARY WE NEED
-*/
-require('lib/hude.js');
-
-/*
-    LOAD CLASS WE NEED
-*/
-
-require('class/line.js');
-require('class/entity.js');
-
-/*
-    LOAD MAIN SCRIPT
-*/
-require('main.js');
+(function() {
+    function loop(i) {
+        const s = require(modules[i]);
+        if (i + 1 < modules.length) {
+            s.addEventListener('load', () => {
+                loop(i + 1);
+            });
+        }
+    }
+    loop(0);
+})();
