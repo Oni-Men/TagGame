@@ -39,7 +39,7 @@ class Line {
     }
 
     render(h) {
-        h.lineOption({
+        h.center().lineOption({
             width: 2.5,
             cap: 'round'
         }).begin().moveTo(this.sx, this.sy).lineTo(this.ex, this.ey).stroke('#666');

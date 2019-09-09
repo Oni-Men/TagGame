@@ -21,6 +21,6 @@ class Entity {
     }
 
     render(h){
-        h.circle(10, this.x, this.y).fill(this.color);
+        h.center().circle(10, this.x, this.y).fill(this.color);
     }
 }
