@@ -12,7 +12,7 @@ const lines = []; //    List of Line Objects
 let line = null; 
 
 const entities = [];
-const player = new Entity(0, 0);
+const player = new Entity(0, 0, '#666');
 
 h.onMouseDonw((x, y) => {
     line = new Line(x, y, x, y);
