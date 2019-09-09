@@ -8,20 +8,29 @@ const autosize = () => {
 window.addEventListener('load', autosize);
 window.addEventListener('resize', autosize);
 
-const lines = []; //    List of Line Objects
+const lines = [
+    new Line(0, -100, 150, -150),
+    new Line(50, -300, 250, -250)
+]; //    List of Line Objects
 let line = null; 
 
 const entities = [];
 const player = new Entity(0, 0, '#666');
 
 h.onMouseDonw((x, y) => {
-    line = new Line(x, y, x, y);
-});
+    if (line == null) {
+        line = new Line(x, y, x, y);
+    }
+}, MouseButton.LEFT);
 
 h.onMouseUp((x, y) => {
-    lines.push(line);
+    if (line != null && line.length > 10) {
+        lines.push(line);
+    } else {
+        player.target(x, y, lines);
+    } 
     line = null;
-});
+}, MouseButton.LEFT);
 
 h.onMouseMove((x, y) => {
     if (line != null) {
@@ -41,9 +50,11 @@ h.onMouseMove((x, y) => {
     }
 
     lines.forEach(l => {
-        l.render(h, '#000F');
+        l.render(h);
     });
 
+
+    player.update();
     player.render(h);
 
     requestAnimationFrame(arguments.callee);

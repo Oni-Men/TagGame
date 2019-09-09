@@ -1,4 +1,5 @@
 const modules = [
+    "lib/math.js",
     "lib/hude.js",
     "class/line.js",
     "class/entity.js",
