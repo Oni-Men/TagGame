@@ -5,7 +5,7 @@ class Entity {
         this.vel = new Vec2D(0, 0);
         this.tpos = null;
 
-        this.pathIndex = 0;
+        this.p = null;
         this.path = []; //List of Vec2D
     }
 
@@ -63,50 +63,44 @@ class Entity {
         }
     }
 
-    get p() {
-        if (this.path && this.pathIndex !== null) {
-            return this.path[this.pathIndex];
-        }
-        return null;
-    }
-
     update() {
-        if (this.path.length == 0) {
+        if (this.p === null) {
+            this.p = this.path.shift();
+        }
+
+        if (this.p === undefined) {
+            this.p = null;
             return;
         }
 
         if (this.pos.distance(this.p) <= this.vel.magnitude()) {
             this.pos.set(this.p);
-            this.pathIndex++;
+            this.p = null;
         } else {
-            this.vel = this.p.subtract(this.pos).normalize();
-            this.pos = this.pos.add(this.vel);
-        }
-
-        if (this.pathIndex == this.path.length) {
-            this.path = [];
-            this.pathIndex = 0;
+            this.vel = this.p.subtract(this.pos).normalize().multiply(2);
+            this.pos.set(this.pos.add(this.vel));
         }
     }
 
     render(h) {
-        if (this.path && this.path.length != 0) {
+        h.begin().moveTo(this.x, this.y);
+        if (this.path) {
             h.center()
             .lineOption({
                 cap: 'round',
-                dashOffset: 4,
+                dashOffset: 0,
                 join: 'miter',
                 width: 1.5,
                 dash: [5, 15]
-            })
-            .begin().moveTo(this.x, this.y);
-            for (let i = this.pathIndex; i < this.path.length; i++) {
-                h.lineTo(this.path[i].x, this.path[i].y);
+            });
+            if (this.path.length != 0) {
+                for (let i = 0; i < this.path.length; i++) {
+                    h.lineTo(this.path[i].x, this.path[i].y);
+                }
+            } else if(this.p != null) {
+                h.lineTo(this.p.x, this.p.y);
             }
             h.stroke('#666');
-            for (let i = 0; i < this.path.length; i++) {
-                h.center().circle(2.5, this.path[i].x, this.path[i].y).fill('#666');
-            }
         }
 
         h.center().circle(5, this.x, this.y).fill(this.color);
@@ -115,10 +109,16 @@ class Entity {
     target(tx, ty, lines) {
         this.tpos = new Vec2D(tx, ty);
 
-        const before = performance.now();
+        this.p = null;
+
         this.findPath(this.pos, this.tpos, lines.slice(), []);
-        const after = performance.now();
-        console.log(`Elapsed: 1 / ${((after - before))}sec`);
+    }
+
+    updateLine(lines) {
+        if (this.tpos) {
+            this.p = null;
+            this.findPath(this.pos, this.tpos, lines.slice(), []);
+        }
     }
 
     /**

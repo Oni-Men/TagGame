@@ -26,6 +26,7 @@ h.onMouseDonw((x, y) => {
 h.onMouseUp((x, y) => {
     if (line != null && line.length > 10) {
         lines.push(line);
+        player.updateLine(lines);
     } else {
         player.target(x, y, lines);
     } 
