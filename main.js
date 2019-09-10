@@ -9,13 +9,11 @@ window.addEventListener('load', autosize);
 window.addEventListener('resize', autosize);
 
 const lines = [
-    new Line(0, -100, 150, -150),
-    new Line(50, -300, 250, -250)
 ]; //    List of Line Objects
+
 let line = null; 
 
-const entities = [];
-const player = new Entity(0, 0, '#666');
+const player = new Entity(0, 0, '#666', true);
 
 h.onMouseDonw((x, y) => {
     if (line == null) {

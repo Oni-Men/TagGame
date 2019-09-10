@@ -1,9 +1,11 @@
 class Entity {
-    constructor(x, y, color){
+    constructor(x, y, color, v){
         this.color = color;
         this.pos = new Vec2D(x, y);
         this.vel = new Vec2D(0, 0);
         this.tpos = null;
+
+        this.v = v;
 
         this.p = null;
         this.path = []; //List of Vec2D
@@ -77,12 +79,16 @@ class Entity {
             this.pos.set(this.p);
             this.p = null;
         } else {
-            this.vel = this.p.subtract(this.pos).normalize().multiply(2);
+            this.vel = this.p.subtract(this.pos).normalize().multiply(this.v ? 2 : 1);
             this.pos.set(this.pos.add(this.vel));
         }
     }
 
     render(h) {
+        h.center().circle(5, this.x, this.y).fill(this.color);
+
+        if (!this.v) return;
+
         h.begin().moveTo(this.x, this.y);
         if (this.path) {
             h.center()
@@ -102,8 +108,6 @@ class Entity {
             }
             h.stroke('#666');
         }
-
-        h.center().circle(5, this.x, this.y).fill(this.color);
     }
 
     target(tx, ty, lines) {
