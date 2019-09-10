@@ -5,6 +5,7 @@ class Entity {
         this.vel = new Vec2D(0, 0);
         this.tpos = null;
 
+        this.pathIndex = 0;
         this.path = []; //List of Vec2D
     }
 
@@ -62,12 +63,29 @@ class Entity {
         }
     }
 
+    get p() {
+        if (this.path && this.pathIndex !== null) {
+            return this.path[this.pathIndex];
+        }
+        return null;
+    }
+
     update() {
-        if (this.tpos != null && 
-            this.pos.distance(this.tpos) < this.vel.magnitude()) {
-            this.pos.set(this.tpos);
+        if (this.path.length == 0) {
+            return;
+        }
+
+        if (this.pos.distance(this.p) <= this.vel.magnitude()) {
+            this.pos.set(this.p);
+            this.pathIndex++;
         } else {
+            this.vel = this.p.subtract(this.pos).normalize();
             this.pos = this.pos.add(this.vel);
+        }
+
+        if (this.pathIndex == this.path.length) {
+            this.path = [];
+            this.pathIndex = 0;
         }
     }
 
@@ -82,22 +100,29 @@ class Entity {
                 dash: [5, 15]
             })
             .begin().moveTo(this.x, this.y);
-            for (let i = this.path.length - 1; i >= 0; i--) {
+            for (let i = this.pathIndex; i < this.path.length; i++) {
                 h.lineTo(this.path[i].x, this.path[i].y);
             }
             h.stroke('#666');
+            for (let i = 0; i < this.path.length; i++) {
+                h.center().circle(2.5, this.path[i].x, this.path[i].y).fill('#666');
+            }
         }
 
-        h.center().circle(10, this.x, this.y).fill(this.color);
+        h.center().circle(5, this.x, this.y).fill(this.color);
     }
 
     target(tx, ty, lines) {
         this.tpos = new Vec2D(tx, ty);
 
+        const before = performance.now();
         this.findPath(this.pos, this.tpos, lines.slice(), []);
+        const after = performance.now();
+        console.log(`Elapsed: 1 / ${((after - before))}sec`);
     }
 
     /**
+     * 川上式
      * 再帰的にルートを探るパスファインダー
      * 
      * @param {Vec2D} sp 始点の座標
@@ -107,7 +132,7 @@ class Entity {
      */
     findPath(sp, tp, lines, path) {
         //始点から目標地点までを結ぶ線分
-        const s = new Line(tp.x, tp.y, sp.x, sp.y);
+        const s = new Line(sp.x, sp.y, tp.x, tp.y);
 
         const intersects = [];
         lines.forEach(l => {
@@ -129,48 +154,41 @@ class Entity {
 
         //交点の遠い順に並び替え
         intersects.sort((a, b) => {
-            const distA = tp.distance(a.pos);
-            const distB = tp.distance(b.pos);
-            if (distA < distB) {
-                return -1;
-            }
-            if (distA > distB) {
-                return 1;
-            }
-            return 0;
+            const distA = sp.distance(a.pos);
+            const distB = sp.distance(b.pos);
+            return distA - distB;
         });
         
         //最も交点の遠い線分
-        const farthest = intersects.shift().line;
+        const nearest = intersects.shift().line;
 
         for (let i = 0; i < lines.length; i++) {
-            if(lines[i].id == farthest.id) {
+            if(lines[i].id == nearest.id) {
                 lines.splice(i, 1);
                 break;
             }
         }
         
         //交点の近い線分の始点と目標地点の距離
-        const d1 = farthest.s.distance(tp);
+        const d1 = nearest.s.distance(tp);
 
         //交点の近い線分の終点と目標地点の距離
-        const d2 = farthest.e.distance(tp);
-
-        console.log(d1);
-        console.log(d2);
+        const d2 = nearest.e.distance(tp);
 
         let nextStartPoint = null;
 
         //近い方を次の始点にする
         if (d1 < d2) {
-            nextStartPoint = farthest.s;
+            nextStartPoint = nearest.s;
         } else {
-            nextStartPoint = farthest.e;
+            nextStartPoint = nearest.e;
         }
 
-        path.push(tp);
-
         this.findPath(sp, nextStartPoint, lines, path);
+
+        path.push(nextStartPoint);
+
+        this.findPath(nextStartPoint, tp, lines, path);
     }
 
     //拝借 from http://marupeke296.com/COL_2D_No10_SegmentAndSegment.html
